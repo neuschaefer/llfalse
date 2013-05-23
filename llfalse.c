@@ -49,10 +49,21 @@ static void parse_cmdline(ecb_unused int argc, ecb_unused char **argv)
 }
 
 
-/* LLVM linkage types for different situations */
-ecb_inline LLVMLinkage data_linkage(void)  { return LLVMPrivateLinkage; }
-ecb_inline LLVMLinkage const_linkage(void) { return LLVMPrivateLinkage; }
+enum linkage {
+	LINKAGE_DATA,
+	LINKAGE_CONST_DATA,
+	LINKAGE_CODE,
+};
 
+/* set LLVM linkage and related attributes */
+void set_linkage(LLVMValueRef v, enum linkage lk)
+{
+	LLVMSetLinkage(v, LLVMPrivateLinkage);
+
+	/* DATA, CONST_DATA: thread-local */
+	/* CONST_DATA: const */
+	/* CODE: anything special? */
+}
 
 /* lambdas are basically anonymous functions */
 struct environment;
@@ -92,7 +103,7 @@ ecb_inline void l_init_llvm(struct lambda *l, const char *name)
 	l->fn = LLVMAddFunction(l->env->module, name, l->env->lambda_type);
 
 	/* Set private linkage to allow better optimization */
-	LLVMSetLinkage(l->fn, LLVMPrivateLinkage);
+	set_linkage(l->fn, LINKAGE_CODE);
 
 	/* TODO: change it so that l->bb is always valid */
 	/* Since new basic blocks are created for all control flow structures,
@@ -315,7 +326,7 @@ static void build_string(struct lambda *l)
 	l->env->string_id++;
 
 	global = LLVMAddGlobal(l->env->module, LLVMTypeOf(str), name_buf);
-	LLVMSetLinkage(global, const_linkage());
+	set_linkage(global, LINKAGE_CONST_DATA);
 	LLVMSetInitializer(global, str);
 
 	/* load from global, pass value to call inst */
@@ -699,18 +710,18 @@ void prepare_env(struct environment *env)
 	/* define uint32_t vars[26]; */
 	art_vars = LLVMArrayType(i32t, 26);
 	env->var_vars = LLVMAddGlobal(env->module, art_vars, "vars");
-	LLVMSetLinkage(env->var_vars, data_linkage());
+	set_linkage(env->var_vars, LINKAGE_DATA);
 	LLVMSetInitializer(env->var_vars, LLVMConstNull(art_vars));
 
 	/* define uint32_t stack[STACKSIZE]; */
 	art_stack = LLVMArrayType(i32t, options.stack_size);
 	env->var_stack = LLVMAddGlobal(env->module, art_stack, "stack");
-	LLVMSetLinkage(env->var_stack, data_linkage());
+	set_linkage(env->var_stack, LINKAGE_DATA);
 	LLVMSetInitializer(env->var_stack, LLVMConstNull(art_stack));
 
 	/* define uint32_t stack_index; */
 	env->var_stackidx = LLVMAddGlobal(env->module, i32t, "stack_index");
-	LLVMSetLinkage(env->var_stackidx, data_linkage());
+	set_linkage(env->var_stackidx, LINKAGE_DATA);
 	LLVMSetInitializer(env->var_stackidx, LLVMConstNull(i32t));
 
 	/* typedef void (*lambda_t)(void); */
@@ -719,7 +730,7 @@ void prepare_env(struct environment *env)
 	/* declare lambda_t lambdas[]; */
 	lambdappt = LLVMPointerType(LLVMPointerType(env->lambda_type, 0), 0);
 	env->var_lambdas = LLVMAddGlobal(env->module, lambdappt, "lambdas");
-	LLVMSetLinkage(env->var_lambdas, const_linkage());
+	set_linkage(env->var_lambdas, LINKAGE_CONST_DATA);
 
 	/* extern void lf_printnum(uint32_t i); */
 	env->func_printnum = LLVMAddFunction(env->module, "lf_printnum", fnt_void_i32);
@@ -774,7 +785,7 @@ void fill_lambdas(struct environment *env)
 	array_const = LLVMConstArray(LLVMPointerType(env->lambda_type,0), values, num);
 	free(values);
 	anon_global = LLVMAddGlobal(env->module, LLVMTypeOf(array_const), "");
-	LLVMSetLinkage(anon_global, const_linkage());
+	set_linkage(anon_global, LINKAGE_CONST_DATA);
 	LLVMSetInitializer(anon_global, array_const);
 
 	/* make the "lambdas" global point to the array */
