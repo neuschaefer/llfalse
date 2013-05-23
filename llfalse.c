@@ -1,6 +1,6 @@
 /*
  * llfalse - a portable False compiler
- * Copyright (C) 2012  Jonathan Neuschäfer <j.neuschaefer@gmx.net>
+ * Copyright (C) 2012-2013  Jonathan Neuschäfer <j.neuschaefer@gmx.net>
  *
  * If you're looking for a type-safe, lightweight False interpreter, please use
  * Wouter's, it's in the package at <http://strlen.com/false-language>
