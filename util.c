@@ -43,7 +43,7 @@ FILE *xfopen(const char *path, const char *mode)
 
 #define GROWBUF_NODE_SIZE 256
 
-static char EMPTY_STRING[1];
+static const char EMPTY_STRING[1];
 
 struct growbuf_node {
 	struct growbuf_node *next;
@@ -167,7 +167,7 @@ static void growbuf_concat(struct growbuf *buf)
 	buf->last = buf->first = node;
 }
 
-char *growbuf_buf(struct growbuf *buf)
+const char *growbuf_buf(struct growbuf *buf)
 {
 	assert(buf != NULL);
 
