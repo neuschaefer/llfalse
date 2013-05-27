@@ -78,7 +78,7 @@ struct lambda {
 	unsigned int n_bb;
 
 	LLVMValueRef fn;
-	LLVMBasicBlockRef bb;
+	LLVMBasicBlockRef bb;	/* always valid */
 	LLVMBuilderRef builder;
 };
 
@@ -105,12 +105,10 @@ ecb_inline void l_init_llvm(struct lambda *l, const char *name)
 	/* Set private linkage to allow better optimization */
 	set_linkage(l->fn, LINKAGE_CODE);
 
-	/* TODO: change it so that l->bb is always valid */
-	/* Since new basic blocks are created for all control flow structures,
-	   we leave bb unset here. Use l_check_bb. */
-	l->bb = NULL;
+	l->bb = LLVMAppendBasicBlock(l->fn, "");
 	l->n_bb = 1;
 	l->builder = LLVMCreateBuilder();
+	LLVMPositionBuilderAtEnd(l->builder, l->bb);
 }
 
 /* allocate a new lambda and add it to the linked list */
@@ -155,16 +153,6 @@ static LLVMBasicBlockRef l_new_bb(struct lambda *l)
 
 	snprintf(buffer, sizeof(buffer), "b%u", l->n_bb++);
 	return LLVMAppendBasicBlock(l->fn, buffer);
-}
-
-/* make sure we have a basic block and the builder is positioned at its end */
-/* TODO: kill this function */
-ecb_inline void l_check_bb(struct lambda *l)
-{
-	if (!l->bb) {
-		l->bb = LLVMAppendBasicBlock(l->fn, "");
-		LLVMPositionBuilderAtEnd(l->builder, l->bb);
-	}
 }
 
 static int l_getchar(struct lambda *l)
@@ -258,8 +246,6 @@ static void grow_stack(struct lambda *l, int delta)
 
 static void push_stack(struct lambda *l, LLVMValueRef value)
 {
-	l_check_bb(l);
-
 	grow_stack(l, 1);
 	store_stack(l, 0, value);
 }
@@ -267,8 +253,6 @@ static void push_stack(struct lambda *l, LLVMValueRef value)
 static LLVMValueRef pop_stack(struct lambda *l)
 {
 	LLVMValueRef ret;
-
-	l_check_bb(l);
 
 	ret = load_stack(l, 0);
 	grow_stack(l, -1);
@@ -279,8 +263,6 @@ static LLVMValueRef index_variables(struct lambda *l, LLVMValueRef ref)
 {
 	LLVMValueRef indices[2];
 
-	l_check_bb(l);
-
 	indices[0] = u32_value(0);
 	indices[1] = ref;
 	return LLVMBuildInBoundsGEP(l->builder, l->env->var_vars, indices, 2, "");
@@ -289,8 +271,6 @@ static LLVMValueRef index_variables(struct lambda *l, LLVMValueRef ref)
 static LLVMValueRef load_lambdas(struct lambda *l, LLVMValueRef index)
 {
 	LLVMValueRef ptr, gep;
-
-	l_check_bb(l);
 
 	ptr = LLVMBuildLoad(l->builder, l->env->var_lambdas, "");
 	gep = LLVMBuildGEP(l->builder, ptr, &index, 1, "");
@@ -330,7 +310,6 @@ static void build_string(struct lambda *l)
 	LLVMSetInitializer(global, str);
 
 	/* load from global, pass value to call inst */
-	l_check_bb(l);
 	indices[0] = u32_value(0);
 	indices[1] = indices[0];
 	str = LLVMBuildGEP(l->builder, global, indices, 2, "");
@@ -382,8 +361,6 @@ static void build_if(struct lambda *l)
 	/* stack: bool,fn - */
 	LLVMValueRef cond_v, cond, body_l, body_fn;
 	LLVMBasicBlockRef body_bb, out_bb;
-
-	l_check_bb(l);
 
 	body_l = pop_stack(l);
 	cond_v = pop_stack(l);
@@ -513,7 +490,6 @@ reparse:
 				l->line = new_l->line;
 				l->column = new_l->column;
 
-				l_check_bb(l);
 				push_stack(l, u32_value(new_l->id));
 			} break;
 		case '\'': /* char value */
@@ -582,21 +558,17 @@ reparse:
 						LLVMIntUGT : LLVMIntSGT);
 			break;
 		case '_': /* neg */
-			l_check_bb(l);
 			store_stack(l, 0, LLVMBuildNeg(l->builder,
 						load_stack(l, 0), ""));
 			break;
 		case '~': /* not (bitwise) */
-			l_check_bb(l);
 			store_stack(l, 0, LLVMBuildNot(l->builder,
 						load_stack(l, 0), ""));
 			break;
 		case '$': /* dup */
-			l_check_bb(l);
 			push_stack(l, load_stack(l, 0));
 			break;
 		case '%': /* drop */
-			l_check_bb(l);
 			grow_stack(l, -1);
 			break;
 		case '\\': /* swap */
@@ -658,7 +630,6 @@ reparse:
 			{
 				LLVMValueRef res;
 
-				l_check_bb(l);
 				res = LLVMBuildCall(l->builder,
 						l->env->func_getchar, NULL, 0, "");
 				push_stack(l, res);
@@ -667,7 +638,6 @@ reparse:
 			if (!options.decode_latin1)
 				goto default_label;
 		case 'B': /* flush (ß) */
-			l_check_bb(l);
 			LLVMBuildCall(l->builder, l->env->func_flush, NULL, 0, "");
 			break;
 default_label: /* goto default; apparently doesn't work */
@@ -680,7 +650,6 @@ default_label: /* goto default; apparently doesn't work */
 	}
 
 	/* add a return intruction */
-	l_check_bb(l);
 	LLVMBuildRetVoid(l->builder);
 
 	/* we don't need the builder anymore */
