@@ -3,9 +3,10 @@
 #include <stdio.h>
 #include <stdint.h>
 
+/* TODO: add signedness flag */
 void lf_printnum(uint32_t num)
 {
-	printf("%lu", (unsigned long) num);
+	printf("%ld", (long) num);
 }
 
 void lf_printstring(const char *str)
