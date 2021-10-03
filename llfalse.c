@@ -598,6 +598,7 @@ reparse:
 		case 0xf8: /* ø in latin1 */
 			if (!options.decode_latin1)
 				goto default_label;
+			/* fall-through */
 		case 'O': /* pick (ø) */
 			/* Get the nth element of the stack, counted from the
 			   top, and push it. The zeroth element is the one just
@@ -641,6 +642,7 @@ reparse:
 		case 0xdf: /* ß in latin1 */
 			if (!options.decode_latin1)
 				goto default_label;
+			/* fall-through */
 		case 'B': /* flush (ß) */
 			LLVMBuildCall(l->builder, l->env->func_flush, NULL, 0, "");
 			break;
