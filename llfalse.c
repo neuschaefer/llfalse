@@ -58,7 +58,7 @@ enum linkage {
 };
 
 /* set LLVM linkage and related attributes */
-void set_linkage(LLVMValueRef v, enum linkage lk)
+static void set_linkage(LLVMValueRef v, enum linkage lk)
 {
 	LLVMSetLinkage(v, LLVMPrivateLinkage);
 
@@ -100,7 +100,7 @@ struct environment {
 	LLVMValueRef var_vars, var_stack, var_stackidx, var_lambdas;
 };
 
-void l_init_llvm(struct lambda *l, const char *name)
+static void l_init_llvm(struct lambda *l, const char *name)
 {
 	l->fn = LLVMAddFunction(l->env->module, name, l->env->lambda_type);
 
@@ -199,7 +199,7 @@ static void l_error(struct lambda *l, const char *fmt, ...)
 }
 
 
-LLVMValueRef u32_value(uint32_t n)
+static LLVMValueRef u32_value(uint32_t n)
 {
 	LLVMTypeRef i32t = LLVMInt32Type();
 	return n? LLVMConstInt(i32t, n, false) : LLVMConstNull(i32t);
@@ -427,8 +427,8 @@ static void build_while(struct lambda *l)
 	l->bb = out_bb;
 }
 
-int ascii_isdigit(int x) { return x >= '0' && x <= '9'; }
-uint32_t ascii_digit_value(int x) { return (uint32_t) (x - '0'); }
+static int ascii_isdigit(int x) { return x >= '0' && x <= '9'; }
+static uint32_t ascii_digit_value(int x) { return (uint32_t) (x - '0'); }
 
 static void parse_lambda(struct lambda *l)
 {
@@ -661,7 +661,7 @@ default_label: /* goto default; apparently doesn't work */
 }
 
 /* build the libfalse interface etc. */
-void prepare_env(struct environment *env)
+static void prepare_env(struct environment *env)
 {
 	LLVMTypeRef voidt, i32t, strt, strpt, intt, lambdappt;
 	LLVMTypeRef fnt_void_i32, fnt_void_str, fnt_i32_void, fnt_void_void;
@@ -740,7 +740,7 @@ void prepare_env(struct environment *env)
 		([2 x void ()*]* @a, i32 0, i32 0), align 8
 
  */
-void fill_lambdas(struct environment *env)
+static void fill_lambdas(struct environment *env)
 {
 	LLVMValueRef *values, array_const, anon_global, gep_ptr, indices[2];
 	unsigned num;
@@ -765,7 +765,7 @@ void fill_lambdas(struct environment *env)
 	LLVMSetInitializer(env->var_lambdas, gep_ptr);
 }
 
-void finish_env(struct environment *env)
+static void finish_env(struct environment *env)
 {
 	LLVMBuilderRef builder;
 	LLVMBasicBlockRef main_bb;
@@ -785,7 +785,7 @@ void finish_env(struct environment *env)
 	LLVMDisposeBuilder(builder);
 }
 
-void compile_file(const char *infile, const char *outfile)
+static void compile_file(const char *infile, const char *outfile)
 {
 	struct environment env;
 	FILE *infp, *outfp;
