@@ -55,3 +55,6 @@ falseflat: falseflat.o
 
 falseflat.o: falseflat.c
 	$(QUIET_CC)$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f llfalse libfalse.so falseflat *.o
