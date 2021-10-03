@@ -1,4 +1,9 @@
-/* utility stuff */
+/*
+ * SPDX-License-Identifier: GPL-2.0
+ * Copyright (C) 2012-2013  Jonathan Neuschäfer <j.neuschaefer@gmx.net>
+ *
+ * utility stuff
+ */
 
 #include <stdio.h>
 #include <assert.h>

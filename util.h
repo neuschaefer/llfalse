@@ -1,4 +1,9 @@
-/* utility functions and stuff. */
+/*
+ * SPDX-License-Identifier: GPL-2.0
+ * Copyright (C) 2012-2013  Jonathan Neuschäfer <j.neuschaefer@gmx.net>
+ *
+ * utility functions and stuff.
+ */
 
 #include <stdlib.h>
 

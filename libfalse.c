@@ -1,4 +1,9 @@
-/* libfalse - the llfalse helper library */
+/*
+ * SPDX-License-Identifier: GPL-2.0
+ * Copyright (C) 2012-2013  Jonathan Neuschäfer <j.neuschaefer@gmx.net>
+ *
+ * libfalse - the llfalse helper library
+ */
 
 #include <stdio.h>
 #include <stdint.h>

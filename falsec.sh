@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2013  Jonathan Neuschäfer
+
 if [ $# != 1 ]; then
 	echo usage: falsec.sh SOURCECODE.f
 	exit 1

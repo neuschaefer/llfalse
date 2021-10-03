@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2013  Jonathan Neuschäfer
+
 all: llfalse libfalse.so falseflat
 
 CC = gcc

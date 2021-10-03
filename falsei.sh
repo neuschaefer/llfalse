@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2013  Jonathan Neuschäfer
+#
 # falsei.sh - a simple llfalse based False interpreter
 # usage: falsei.sh FILE.F
 

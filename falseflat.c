@@ -1,5 +1,9 @@
-/* Copyright (C) 2012  Jonathan Neuschäfer
-   You may do anything with the code in this file. It's a hack, really! */
+/*
+ * SPDX-License-Identifier: GPL-2.0
+ * Copyright (C) 2012  Jonathan Neuschäfer
+ *
+ * It's a hack, really!
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
