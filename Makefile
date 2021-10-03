@@ -10,15 +10,11 @@ LD = gcc
 AR = ar
 
 HAVE_LLVM:=$(shell llvm-config --version >/dev/null 2>&1 && echo 'yes')
-HAVE_LLVM_VERSION:=$(shell llvm-config --version | grep "^[3-9].*" >/dev/null 2>&1 && echo yes)
 LLVM_VERSION=$(shell llvm-config --version)
 
 ifneq ($(HAVE_LLVM),yes)
 $(error Your system doesn\'t have LLVM, but llfalse needs it to compile.)
 else
-ifneq ($(HAVE_LLVM_VERSION), yes)
-$(error llfalse needs LLVM version 3.0 or higher, but $(LLVM_VERSION) is installed.)
-endif
 endif
 
 LLVM_COMPONENTS = core bitwriter analysis
