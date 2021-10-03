@@ -1,7 +1,5 @@
 /* utility stuff */
 
-#include "ecb.h"
-
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>

@@ -16,8 +16,6 @@
 #include <ctype.h>
 #include <limits.h>
 
-#define ECB_NO_THREADS 1
-#include "ecb.h"
 #include "util.h"
 
 #include <llvm-c/Core.h>
@@ -43,8 +41,10 @@ static struct {
 	.int_width = sizeof(int) * CHAR_BIT /* FIXME */
 };
 
-static void parse_cmdline(ecb_unused int argc, ecb_unused char **argv)
+static void parse_cmdline(int argc, char **argv)
 {
+	(void)argc;
+	(void)argv;
 	/* nop */
 }
 
@@ -98,7 +98,7 @@ struct environment {
 	LLVMValueRef var_vars, var_stack, var_stackidx, var_lambdas;
 };
 
-ecb_inline void l_init_llvm(struct lambda *l, const char *name)
+void l_init_llvm(struct lambda *l, const char *name)
 {
 	l->fn = LLVMAddFunction(l->env->module, name, l->env->lambda_type);
 
@@ -197,7 +197,7 @@ static void l_error(struct lambda *l, const char *fmt, ...)
 }
 
 
-ecb_inline LLVMValueRef u32_value(uint32_t n)
+LLVMValueRef u32_value(uint32_t n)
 {
 	LLVMTypeRef i32t = LLVMInt32Type();
 	return n? LLVMConstInt(i32t, n, false) : LLVMConstNull(i32t);
@@ -425,8 +425,8 @@ static void build_while(struct lambda *l)
 	l->bb = out_bb;
 }
 
-ecb_inline int ascii_isdigit(int x) { return x >= '0' && x <= '9'; }
-ecb_inline uint32_t ascii_digit_value(int x) { return (uint32_t) (x - '0'); }
+int ascii_isdigit(int x) { return x >= '0' && x <= '9'; }
+uint32_t ascii_digit_value(int x) { return (uint32_t) (x - '0'); }
 
 static void parse_lambda(struct lambda *l)
 {
