@@ -1,4 +1,4 @@
-all: llfalse libfalse.so
+all: llfalse libfalse.so falseflat
 
 CC = gcc
 #CFLAGS = -O2 -finline-functions -g
@@ -45,4 +45,10 @@ libfalse.so: libfalse.o
 	$(QUIET_LD)$(LD) -shared $(LDFLAGS) $< -o $@
 
 libfalse.o: libfalse.c
+	$(QUIET_CC)$(CC) $(CFLAGS) -c $< -o $@
+
+falseflat: falseflat.o
+	$(QUIET_LD)$(LD) $< $(LDFLAGS) -o $@
+
+falseflat.o: falseflat.c
 	$(QUIET_CC)$(CC) $(CFLAGS) -c $< -o $@
