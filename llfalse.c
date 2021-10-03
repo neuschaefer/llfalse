@@ -60,11 +60,13 @@ enum linkage {
 /* set LLVM linkage and related attributes */
 static void set_linkage(LLVMValueRef v, enum linkage lk)
 {
-	LLVMSetLinkage(v, LLVMPrivateLinkage);
-
-	/* DATA, CONST_DATA: thread-local */
-	/* CONST_DATA: const */
-	/* CODE: anything special? */
+	switch (lk) {
+	case LINKAGE_DATA:
+	case LINKAGE_CONST_DATA:
+	case LINKAGE_CODE:
+		LLVMSetLinkage(v, LLVMPrivateLinkage);
+		break;
+	}
 }
 
 /* lambdas are basically anonymous functions */
