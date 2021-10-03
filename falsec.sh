@@ -8,4 +8,4 @@ if [ $# != 1 ]; then
 fi
 
 cat $1 | `dirname $0`/llfalse | opt -O2 > "$1.bc" || exit 1
-llc "$1.bc" && gcc -L . -lfalse "$1.s" -o "$1.bin"
+llc --relocation-model=pic "$1.bc" && gcc -L . "$1.s" -lfalse -o "$1.bin"

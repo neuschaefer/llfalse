@@ -6,7 +6,7 @@ all: llfalse libfalse.so falseflat
 CC = gcc
 #CFLAGS = -O2 -finline-functions -g
 CFLAGS = -O0 -g
-CFLAGS += -Wall -Wextra -Wwrite-strings -std=c99
+CFLAGS += -Wall -Wextra -Wwrite-strings -std=c99 -fPIC
 #CFLAGS += -Werror
 LDFLAGS += -g
 LD = gcc
