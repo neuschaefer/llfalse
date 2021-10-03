@@ -5,7 +5,7 @@
  * llfalse - a portable False compiler
  *
  * If you're looking for a type-safe, lightweight False interpreter, please use
- * Wouter's, it's in the package at <http://strlen.com/false-language>
+ * Wouter's, it's in the package at <https://strlen.com/false-language>
  */
 
 #include <stdlib.h>

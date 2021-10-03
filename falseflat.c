@@ -13,7 +13,7 @@ static void help(const char *argv0)
 {
 	printf(
 "This is falseflat, an equivalent of topformflat for the False programming\n"
-"language. See http://delta.tigris.org/ and http://strlen.com/false for more\n"
+"language. See http://delta.tigris.org/ and https://strlen.com/false for more\n"
 "information.\n\n"
 "Usage: %s [level] <in_file.f >out_file.f\n", argv0);
 }
